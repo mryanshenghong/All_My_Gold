@@ -65,6 +65,9 @@ frame:RegisterEvent("ADDON_LOADED")
 -- 事件处理函数
 frame:SetScript("OnEvent", function(self, event, addonName)
     if event == "PLAYER_LOGIN" then
+        -- 确保只在玩家登录时显示框架
+        frame:Show()
+
         local name = UnitName("player")
         local realm = GetRealmName()
         local fullName = name .. " - " .. realm
@@ -88,8 +91,7 @@ frame:SetScript("OnEvent", function(self, event, addonName)
         -- 保存到SavedVariables
         All_My_Gold_CharacterList = characters
         updateCharacterList()
-        frame:Show()
-    elseif event == "ADDON_LOADED" and addonName == "MyFirstAddon" then
+    elseif event == "ADDON_LOADED" and addonName == "All_My_Gold" then
         -- 从SavedVariables加载已记录的角色数据
         if All_My_Gold_CharacterList then
             characters = All_My_Gold_CharacterList
@@ -98,4 +100,4 @@ frame:SetScript("OnEvent", function(self, event, addonName)
 end)
 
 -- 确保框架显示
-frame:Show()
+frame:Hide() -- 初始隐藏框架，待玩家登录时显示
