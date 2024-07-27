@@ -1,9 +1,19 @@
 ## Interface: 11403
-## Title: My First Addon
-## Notes: This is a simple example addon
-## Author: YourName
+## Title: All my gold preview
+## Notes: Bambi super addon
+## Author: Bambi
 ## Version: 1.0.0
-## SavedVariables: All_My_Gold_CharacterList
+## SavedVariables: All_My_Gold_Database
+
+
+Libs\LibStub\LibStub.lua
+
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs/LibDBIcon-1.0/LibDBIcon-1.0.lua
+
+Libs\AceAddon-3.0\AceAddon-3.0.lua
+Libs\AceEvent-3.0\AceEvent-3.0.lua
+Libs\AceConsole-3.0\AceConsole-3.0.lua
 
 All_My_Gold.lua
-All_My_Gold.xml

@@ -1,131 +1,168 @@
--- 创建一个表来存储角色数据
-local characters = {}
+-- MyGoldTracker.lua
+local MyGoldTracker = LibStub("AceAddon-3.0"):NewAddon("All_My_Gold", "AceConsole-3.0", "AceEvent-3.0")
 
--- 创建一个框架，并使用 BackdropTemplateMixin
-local frame = CreateFrame("Frame", "All_My_Gold_Frame", UIParent, "BackdropTemplate")
-frame:SetSize(300, 400)  -- 设置框架大小
-frame:SetPoint("CENTER") -- 设置框架位置为屏幕中央
-frame:SetBackdrop({
-    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-    tile = true,
-    tileSize = 16,
-    edgeSize = 16,
-    insets = { left = 4, right = 4, top = 4, bottom = 4 }
-})
-frame:SetBackdropColor(0, 0, 0, 1) -- 背景颜色：黑色
-frame:EnableMouse(true)
-frame:SetMovable(true)
-frame:RegisterForDrag("LeftButton")
-frame:SetScript("OnDragStart", frame.StartMoving)
-frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
-
--- 创建滚动框架
-local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
-scrollFrame:SetPoint("TOPLEFT", 10, -10)
-scrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
-
-local content = CreateFrame("Frame", nil, scrollFrame)
-content:SetSize(1, 1) -- 初始大小，可以在之后调整
-
-scrollFrame:SetScrollChild(content)
-
--- 更新显示的角色数据
-local function updateCharacterList()
-    -- 清空现有的内容
-    content:SetHeight(0) -- 重置内容的高度以清空内容
-
-    local previousLabel
-    local totalMoney = 0 -- 用于累加所有角色的金币
-
-    for i, character in ipairs(characters) do
-        totalMoney = totalMoney + character.money -- 累加金币
-        local label = content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        label:SetText(character.name .. " - " .. GetMoneyString(character.money))
-        if previousLabel then
-            label:SetPoint("TOPLEFT", previousLabel, "BOTTOMLEFT", 0, -5)
-        else
-            label:SetPoint("TOPLEFT", 0, 0)
+-- 存储角色金币数据的数据库
+All_My_Gold_Database = All_My_Gold_Database or {}
+-- 创建 LibDataBroker 对象
+local dataObject = LibStub("LibDataBroker-1.1"):NewDataObject("All_My_Gold", {
+    type = "data source",
+    text = "Gold Tracker",
+    icon = "Interface\\Icons\\inv_misc_coin_01",
+    OnClick = function(_, button)
+        if button == "LeftButton" then
+            
+            -- 关闭摘要窗口（如果打开的话）
+            if MyGoldTracker.summaryFrame and MyGoldTracker.summaryFrame:IsVisible() then
+                MyGoldTracker.summaryFrame:Hide()
+            else
+                MyGoldTracker:ShowGoldSummary()
+            end
+        elseif button == "RightButton" then
+            MyGoldTracker:ResetDatabase()
         end
-        previousLabel = label
-    end
+    end,
+    OnEnter = function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT")
+        GameTooltip:ClearLines()
+        GameTooltip:AddLine("金币总和", 1, 1, 1) -- 添加标题
+        GameTooltip:AddLine("左键点击查看所有角色金币", 1, 1, 1)
+        GameTooltip:AddLine("右键清空数据", 1, 1, 1)
+        GameTooltip:Show()
+    end,
+    OnLeave = function()
+        GameTooltip:Hide()
+    end,
+})
 
-    -- 创建一个显示总金币的标签
-    local totalLabel = content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    totalLabel:SetText("总金币: " .. GetMoneyString(totalMoney))
-    totalLabel:SetPoint("TOPLEFT", previousLabel, "BOTTOMLEFT", 0, -10) -- 将总金币标签放在角色列表下方
 
-    content:SetHeight(#characters * 20 + (#characters - 1) * 5 + 30)    -- 适应总金币标签的高度
+-- 初始化
+function MyGoldTracker:OnInitialize()
+    self:UpdateTotalGold() -- 初始化时更新金币总数
 end
 
--- 注册事件
-frame:RegisterEvent("PLAYER_LOGIN")
-frame:RegisterEvent("ADDON_LOADED")
+-- 注册聊天命令
+function MyGoldTracker:OnEnable()
+    self:RegisterChatCommand("goldtracker", "ChatCommand")
+    self:UpdateGoldData()
+end
 
--- 事件处理函数
-frame:SetScript("OnEvent", function(self, event, addonName)
-    if event == "PLAYER_LOGIN" then
-        -- 玩家登录时初始化数据
-        local name = UnitName("player")
-        local realm = GetRealmName()
-        local fullName = name .. " - " .. realm
-        local money = GetMoney()
+function MyGoldTracker:ChatCommand(input)
+    if input == "show" then
+        self:ShowGoldSummary()
+    elseif input == "reset" then
+        self:ResetDatabase()
+    else
+        print("Usage: /goldtracker show | reset")
+    end
+end
 
-        -- 检查角色是否已被记录
-        local found = false
-        for _, character in ipairs(characters) do
-            if character.name == fullName then
-                character.money = money
-                found = true
-                break
+-- 显示金币摘要窗口
+function MyGoldTracker:ShowGoldSummary()
+    if not self.summaryFrame then
+        -- 创建 summaryFrame
+        self.summaryFrame = CreateFrame("Frame", "MyGoldTrackerSummaryFrame", UIParent, "BasicFrameTemplateWithInset")
+        self.summaryFrame:SetSize(300, 400)
+        self.summaryFrame:SetPoint("CENTER")
+        self.summaryFrame:SetMovable(true)
+        self.summaryFrame:EnableMouse(true)
+        self.summaryFrame:RegisterForDrag("LeftButton")
+        self.summaryFrame:SetScript("OnDragStart", self.summaryFrame.StartMoving)
+        self.summaryFrame:SetScript("OnDragStop", self.summaryFrame.StopMovingOrSizing)
+
+        local title = self.summaryFrame:CreateFontString(nil, "OVERLAY")
+        title:SetFontObject("GameFontHighlightLarge")
+        title:SetPoint("CENTER", self.summaryFrame.TitleBg, "CENTER", 5, 0)
+        title:SetText("金币总和")
+
+        local scrollFrame = CreateFrame("ScrollFrame", nil, self.summaryFrame, "UIPanelScrollFrameTemplate")
+        scrollFrame:SetPoint("TOPLEFT", 10, -40)
+        scrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
+
+        local content = CreateFrame("Frame", nil, scrollFrame)
+        content:SetSize(260, 360)
+        scrollFrame:SetScrollChild(content)
+
+        local offsetY = -10
+        local totalGold = 0
+
+        for realmName, realmData in pairs(All_My_Gold_Database) do
+            local realmTitle = content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+            realmTitle:SetPoint("TOPLEFT", 10, offsetY)
+            realmTitle:SetText(realmName)
+            offsetY = offsetY - 20
+
+            for characterName, gold in pairs(realmData) do
+                local charGold = content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+                charGold:SetPoint("TOPLEFT", 20, offsetY)
+                if type(gold) == "number" then
+                    charGold:SetText(characterName .. ": " .. C_CurrencyInfo.GetCoinTextureString(gold))
+                    totalGold = totalGold + gold -- 累加金币
+                else
+                    charGold:SetText(characterName .. ": 0")
+                end
+                offsetY = offsetY - 20
+            end
+
+            offsetY = offsetY - 10
+        end
+
+        -- 显示总金币
+        local totalLabel = content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        totalLabel:SetPoint("TOPLEFT", 10, offsetY)
+        totalLabel:SetText("合计: " .. C_CurrencyInfo.GetCoinTextureString(totalGold))
+    else
+        self.summaryFrame:Show()
+    end
+end
+
+-- 重置数据库
+function MyGoldTracker:ResetDatabase()
+    All_My_Gold_Database = {} -- 清空数据库
+    -- print("All_My_Gold_Database has been reset.")
+    self:UpdateTotalGold()    -- 更新总金币显示
+
+    -- 关闭摘要窗口（如果打开的话）
+    if self.summaryFrame and self.summaryFrame:IsVisible() then
+        self.summaryFrame:Hide()
+        self.summaryFrame = nil -- 释放引用
+        -- print("Gold summary UI has been closed.")
+    else
+        -- print("Gold summary UI is not open.")
+    end
+end
+
+-- 更新金币数据
+function MyGoldTracker:UpdateGoldData()
+    local realmName = GetRealmName()
+    local characterName = UnitName("player")
+    local gold = GetMoney() -- 获取当前角色的金币
+
+    -- 确保数据库中有该角色的金币数据
+    if not All_My_Gold_Database[realmName] then
+        All_My_Gold_Database[realmName] = {}
+    end
+    All_My_Gold_Database[realmName][characterName] = gold
+
+    -- print("Updated " .. characterName .. "'s gold to " .. C_CurrencyInfo.GetCoinTextureString(gold))
+    self:UpdateTotalGold() -- 更新总金币显示
+end
+
+-- 更新总金币显示
+function MyGoldTracker:UpdateTotalGold()
+    local totalGold = 0
+    for realmName, realmData in pairs(All_My_Gold_Database) do
+        for characterName, gold in pairs(realmData) do
+            if type(gold) == "number" then
+                totalGold = totalGold + gold
+            else
+                print("Warning: Invalid gold value for character " .. characterName .. " in realm " .. realmName)
             end
         end
-
-        -- 如果角色不在列表中，则添加
-        if not found then
-            table.insert(characters, { name = fullName, money = money })
-        end
-
-        -- 保存到SavedVariables
-        All_My_Gold_CharacterList = characters
-        updateCharacterList()
-    elseif event == "ADDON_LOADED" and addonName == "All_My_Gold" then
-        -- 从SavedVariables加载已记录的角色数据
-        if All_My_Gold_CharacterList then
-            characters = All_My_Gold_CharacterList
-        end
     end
-end)
-
+    dataObject.text = "合计: " .. C_CurrencyInfo.GetCoinTextureString(totalGold)
+    -- print("Updated total gold: " .. totalGold)
+end
 
 -- 创建小地图按钮
-local minimapButton = CreateFrame("Button", "MyFirstAddonMinimapButton", Minimap)
-minimapButton:SetSize(30, 30)
-
--- 设置按钮的正常纹理为圆形图标
-local normalTexture = minimapButton:CreateTexture()
-normalTexture:SetAllPoints()
-normalTexture:SetTexture("Interface/Addons/All_My_Gold/bambi.tga") -- 使用一个圆形图标
-minimapButton:SetNormalTexture(normalTexture)
-
--- 设置高亮纹理
-local highlightTexture = minimapButton:CreateTexture()
-highlightTexture:SetAllPoints()
-highlightTexture:SetTexture("Interface/Buttons/UI-Common-MouseHilight")
-highlightTexture:SetBlendMode("ADD")
-minimapButton:SetHighlightTexture(highlightTexture)
-
--- 设置按钮位置
-minimapButton:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -10, -10)
-
--- 小地图按钮点击事件
-minimapButton:SetScript("OnClick", function()
-    if frame:IsShown() then
-        frame:Hide()
-    else
-        frame:Show()
-    end
-end)
-
--- 确保框架初始隐藏
-frame:Hide() -- 初始隐藏框架，待点击小地图按钮时显示
+local LDBIcon = LibStub("LibDBIcon-1.0")
+LDBIcon:Register("All_My_Gold", dataObject, {})
