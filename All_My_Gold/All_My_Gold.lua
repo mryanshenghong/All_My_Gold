@@ -107,18 +107,22 @@ normalTexture:SetAllPoints()
 normalTexture:SetTexture("Interface/Icons/INV_Misc_QuestionMark") -- 替换为你想要的图标
 minimapButton:SetNormalTexture(normalTexture)
 
-minimapButton:SetHighlightTexture("Interface/Buttons/UI-Common-MouseHilight")
+-- 设置高亮纹理
+local highlightTexture = minimapButton:CreateTexture()
+highlightTexture:SetAllPoints()
+highlightTexture:SetTexture("Interface/Buttons/UI-Common-MouseHilight")
+highlightTexture:SetBlendMode("ADD")
+minimapButton:SetHighlightTexture(highlightTexture)
+
+-- 创建遮罩来实现圆形效果
+local mask = minimapButton:CreateMaskTexture()
+mask:SetTexture("Interface/Buttons/WHITE8X8")
+mask:SetAllPoints()
+mask:SetSize(30, 30)
+mask:SetTexCoord(0, 1, 0, 1)
+minimapButton:SetMaskTexture(mask)
 
 minimapButton:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -10, -10)
-
--- 小地图按钮点击事件
-minimapButton:SetScript("OnClick", function()
-    if frame:IsShown() then
-        frame:Hide()
-    else
-        frame:Show()
-    end
-end)
 
 -- 确保框架初始隐藏
 frame:Hide() -- 初始隐藏框架，待点击小地图按钮时显示
