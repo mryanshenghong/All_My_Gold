@@ -33,8 +33,8 @@ scrollFrame:SetScrollChild(content)
 -- 更新显示的角色数据
 local function updateCharacterList()
     -- 清空现有的内容
-    for _, child in ipairs({ content:GetChildren() }) do
-        child:Hide() -- 隐藏子元素，避免重叠
+    for i, child in ipairs({ content:GetChildren() }) do
+        child:Hide() -- 隐藏所有子元素
     end
 
     local previousLabel
@@ -88,13 +88,13 @@ frame:SetScript("OnEvent", function(self, event, addonName)
         end
 
         -- 保存到SavedVariables
-        All_My_Gold_CharacterList = characters
+        MyFirstAddon_CharacterData = characters
         updateCharacterList()
         frame:Show()
     elseif event == "ADDON_LOADED" and addonName == "MyFirstAddon" then
         -- 从SavedVariables加载已记录的角色数据
-        if All_My_Gold_CharacterList then
-            characters = All_My_Gold_CharacterList
+        if MyFirstAddon_CharacterData then
+            characters = MyFirstAddon_CharacterData
         end
     end
 end)
