@@ -1,5 +1,5 @@
--- 创建一个框架
-local frame = CreateFrame("Frame", "MyFirstAddonFrame", UIParent)
+-- 创建一个框架，并使用 BackdropTemplateMixin
+local frame = CreateFrame("Frame", "MyFirstAddonFrame", UIParent, "BackdropTemplate")
 frame:SetSize(200, 100)  -- 设置框架大小
 frame:SetPoint("CENTER") -- 设置框架位置为屏幕中央
 
