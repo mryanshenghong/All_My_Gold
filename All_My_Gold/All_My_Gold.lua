@@ -98,17 +98,15 @@ frame:SetScript("OnEvent", function(self, event, addonName)
 end)
 
 -- 创建小地图按钮
-local minimapButton = CreateFrame("Button", "All_My_Gold_Minimap_Button", Minimap)
+local minimapButton = CreateFrame("Button", "MyFirstAddonMinimapButton", Minimap)
 minimapButton:SetSize(30, 30)
 
--- 创建一个遮罩以使按钮呈现圆形
-local mask = minimapButton:CreateMaskTexture()
-mask:SetAllPoints()
-mask:SetTexture("Interface/Buttons/UI-Quickslot-Depress")
-minimapButton:SetMaskTexture(mask)
+-- 设置按钮的正常纹理为圆形图标
+local normalTexture = minimapButton:CreateTexture()
+normalTexture:SetAllPoints()
+normalTexture:SetTexture("Interface/Icons/INV_Misc_QuestionMark") -- 替换为你想要的图标
+minimapButton:SetNormalTexture(normalTexture)
 
--- 设置按钮的正常纹理为图标
-minimapButton:SetNormalTexture("Interface/Icons/INV_Misc_QuestionMark") -- 替换为你想要的图标
 minimapButton:SetHighlightTexture("Interface/Buttons/UI-Common-MouseHilight")
 
 minimapButton:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -10, -10)
