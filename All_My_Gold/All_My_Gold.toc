@@ -1,8 +1,9 @@
-## Interface: 11403
+## Interface: 110000, 11403
+## X-Curse-Project-ID: 1072198
 ## Title: All my gold preview
-## Notes: Bambi super addon
+## Notes: Display characters gold
 ## Author: Bambi
-## Version: 1.0.0
+## Version: 1.0.1
 ## SavedVariables: All_My_Gold_Database
 
 
