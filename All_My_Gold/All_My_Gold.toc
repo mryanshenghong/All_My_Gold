@@ -1,7 +1,9 @@
 ## Interface: 11403
-## Title: Test Addon
+## Title: My First Addon
 ## Notes: This is a simple example addon
-## Author: Shenghong
+## Author: YourName
 ## Version: 1.0.0
+## SavedVariables: All_My_Gold_CharacterList
 
 All_My_Gold.lua
+All_My_Gold.xml
