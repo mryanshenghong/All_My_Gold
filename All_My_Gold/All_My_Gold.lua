@@ -105,7 +105,7 @@ minimapButton:SetSize(30, 30)
 -- 设置按钮的正常纹理为圆形图标
 local normalTexture = minimapButton:CreateTexture()
 normalTexture:SetAllPoints()
-normalTexture:SetTexture("Interface/Icons/INV_Misc_QuestionMark") -- 使用一个圆形图标
+normalTexture:SetTexture("Interface/Addons/All_My_Gold/bambi.tga") -- 使用一个圆形图标
 minimapButton:SetNormalTexture(normalTexture)
 
 -- 设置高亮纹理
