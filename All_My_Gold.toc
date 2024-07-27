@@ -2,19 +2,22 @@
 ## X-Curse-Project-ID: 1072198
 ## Title: All my gold preview
 ## Notes: Display characters gold
+## Notes-zhCN: All my gold 显示所有角色金币总和
 ## Author: Bambi
-## Version: 1.0.1
+## Version: 1.0.2
 ## SavedVariables: All_My_Gold_Database
 
 
-Libs\LibStub\LibStub.lua
+Locales\LoadLocales.xml
 
+Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
-Libs/LibDBIcon-1.0/LibDBIcon-1.0.lua
+Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
 
 Libs\AceAddon-3.0\AceAddon-3.0.lua
 Libs\AceEvent-3.0\AceEvent-3.0.lua
 Libs\AceConsole-3.0\AceConsole-3.0.lua
+
 
 All_My_Gold.lua

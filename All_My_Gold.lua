@@ -1,5 +1,9 @@
--- MyGoldTracker.lua
-local MyGoldTracker = LibStub("AceAddon-3.0"):NewAddon("All_My_Gold", "AceConsole-3.0", "AceEvent-3.0")
+local _, MyGoldTracker = ...
+local L = MyGoldTracker.L
+
+MyGoldTracker = LibStub("AceAddon-3.0"):NewAddon("All_My_Gold", "AceConsole-3.0", "AceEvent-3.0")
+
+
 
 -- 存储角色金币数据的数据库
 All_My_Gold_Database = All_My_Gold_Database or {}
@@ -24,9 +28,9 @@ local dataObject = LibStub("LibDataBroker-1.1"):NewDataObject("All_My_Gold", {
     OnEnter = function(self)
         GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT")
         GameTooltip:ClearLines()
-        GameTooltip:AddLine("金币总和", 1, 1, 1) -- 添加标题
-        GameTooltip:AddLine("左键点击查看所有角色金币", 1, 1, 1)
-        GameTooltip:AddLine("右键清空数据", 1, 1, 1)
+        GameTooltip:AddLine(L['TOOLTIP_GOLD_SUMMARY'], 1, 1, 1) -- 添加标题
+        GameTooltip:AddLine(L["LEFT_CLICK_TOOLTIP"], 1, 1, 1)
+        GameTooltip:AddLine(L["RIGHT_CLICK_TOOLTIP"], 1, 1, 1)
         GameTooltip:Show()
     end,
     OnLeave = function()
@@ -52,7 +56,7 @@ function MyGoldTracker:ChatCommand(input)
     elseif input == "reset" then
         self:ResetDatabase()
     else
-        print("Usage: /goldtracker show | reset")
+        print(L['COMMAND_USAGE'])
     end
 end
 
@@ -72,7 +76,7 @@ function MyGoldTracker:ShowGoldSummary()
         local title = self.summaryFrame:CreateFontString(nil, "OVERLAY")
         title:SetFontObject("GameFontHighlightLarge")
         title:SetPoint("CENTER", self.summaryFrame.TitleBg, "CENTER", 5, 0)
-        title:SetText("金币总和")
+        title:SetText(L["GOLD_SUMMARY"] )
 
         local scrollFrame = CreateFrame("ScrollFrame", nil, self.summaryFrame, "UIPanelScrollFrameTemplate")
         scrollFrame:SetPoint("TOPLEFT", 10, -40)
@@ -96,7 +100,7 @@ function MyGoldTracker:ShowGoldSummary()
                 charGold:SetPoint("TOPLEFT", 20, offsetY)
                 if type(gold) == "number" then
                     charGold:SetText(characterName .. ": " .. C_CurrencyInfo.GetCoinTextureString(gold))
-                    totalGold = totalGold + gold -- 累加金币
+                    totalGold = totalGold + gold
                 else
                     charGold:SetText(characterName .. ": 0")
                 end
@@ -109,7 +113,7 @@ function MyGoldTracker:ShowGoldSummary()
         -- 显示总金币
         local totalLabel = content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
         totalLabel:SetPoint("TOPLEFT", 10, offsetY)
-        totalLabel:SetText("合计: " .. C_CurrencyInfo.GetCoinTextureString(totalGold))
+        totalLabel:SetText(L["GOLD_TOTAL"] .. C_CurrencyInfo.GetCoinTextureString(totalGold))
     else
         self.summaryFrame:Show()
     end
@@ -155,7 +159,8 @@ function MyGoldTracker:UpdateTotalGold()
             if type(gold) == "number" then
                 totalGold = totalGold + gold
             else
-                print("Warning: Invalid gold value for character " .. characterName .. " in realm " .. realmName)
+                local warning = ("").format(L["Warning: Invalid gold value for character %s in realm %s"],characterName,realmName)
+                print(warning)
             end
         end
     end
