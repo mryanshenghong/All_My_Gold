@@ -97,6 +97,7 @@ frame:SetScript("OnEvent", function(self, event, addonName)
     end
 end)
 
+
 -- 创建小地图按钮
 local minimapButton = CreateFrame("Button", "MyFirstAddonMinimapButton", Minimap)
 minimapButton:SetSize(30, 30)
@@ -114,18 +115,7 @@ highlightTexture:SetTexture("Interface/Buttons/UI-Common-MouseHilight")
 highlightTexture:SetBlendMode("ADD")
 minimapButton:SetHighlightTexture(highlightTexture)
 
--- 添加圆形效果
-minimapButton:SetBackdrop({
-    bgFile = "Interface/Buttons/WHITE8X8",
-    edgeFile = "Interface/Buttons/WHITE8X8",
-    tile = false,
-    tileSize = 0,
-    edgeSize = 15,
-    insets = { left = 0, right = 0, top = 0, bottom = 0 }
-})
-minimapButton:SetBackdropColor(1, 1, 1, 0)       -- 背景透明
-minimapButton:SetBackdropBorderColor(0, 0, 0, 1) -- 黑色边框
-
+-- 设置按钮位置
 minimapButton:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -10, -10)
 
 -- 小地图按钮点击事件
