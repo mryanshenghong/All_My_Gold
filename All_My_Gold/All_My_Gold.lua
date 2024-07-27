@@ -26,5 +26,10 @@ frame:RegisterEvent("PLAYER_LOGIN")
 frame:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_LOGIN" then
         print("My First Addon loaded!")
+        -- 显示框架
+        frame:Show()
     end
 end)
+
+-- 确保框架显示
+frame:Show()
