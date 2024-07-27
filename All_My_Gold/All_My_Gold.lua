@@ -14,6 +14,11 @@ frame:SetBackdrop({
     insets = { left = 4, right = 4, top = 4, bottom = 4 }
 })
 frame:SetBackdropColor(0, 0, 0, 1) -- 背景颜色：黑色
+frame:EnableMouse(true)
+frame:SetMovable(true)
+frame:RegisterForDrag("LeftButton")
+frame:SetScript("OnDragStart", frame.StartMoving)
+frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
 
 -- 创建滚动框架
 local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
@@ -27,10 +32,15 @@ scrollFrame:SetScrollChild(content)
 
 -- 更新显示的角色数据
 local function updateCharacterList()
+    content:ReleaseChildren() -- 清空现有的内容
+
     local previousLabel
+    local totalMoney = 0 -- 用于累加所有角色的金币
+
     for i, character in ipairs(characters) do
+        totalMoney = totalMoney + character.money -- 累加金币
         local label = content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        label:SetText(character.name .. " - " .. GetCoinTextureString(character.money))
+        label:SetText(character.name .. " - " .. GetMoneyString(character.money))
         if previousLabel then
             label:SetPoint("TOPLEFT", previousLabel, "BOTTOMLEFT", 0, -5)
         else
@@ -38,7 +48,13 @@ local function updateCharacterList()
         end
         previousLabel = label
     end
-    content:SetHeight(#characters * 20 + (#characters - 1) * 5)
+
+    -- 创建一个显示总金币的标签
+    local totalLabel = content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    totalLabel:SetText("总金币: " .. GetMoneyString(totalMoney))
+    totalLabel:SetPoint("TOPLEFT", previousLabel, "BOTTOMLEFT", 0, -10) -- 将总金币标签放在角色列表下方
+
+    content:SetHeight(#characters * 20 + (#characters - 1) * 5 + 30)    -- 适应总金币标签的高度
 end
 
 -- 注册事件
@@ -69,13 +85,13 @@ frame:SetScript("OnEvent", function(self, event, addonName)
         end
 
         -- 保存到SavedVariables
-        All_My_Gold_CharacterList = characters
+        MyFirstAddon_CharacterData = characters
         updateCharacterList()
         frame:Show()
-    elseif event == "ADDON_LOADED" and addonName == "All_My_Gold" then
+    elseif event == "ADDON_LOADED" and addonName == "MyFirstAddon" then
         -- 从SavedVariables加载已记录的角色数据
-        if All_My_Gold_CharacterList then
-            characters = All_My_Gold_CharacterList
+        if MyFirstAddon_CharacterData then
+            characters = MyFirstAddon_CharacterData
         end
     end
 end)
