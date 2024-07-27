@@ -102,12 +102,30 @@ local minimapButton = CreateFrame("Button", "MyFirstAddonMinimapButton", Minimap
 minimapButton:SetSize(30, 30)
 
 -- 设置按钮的正常纹理为圆形图标
-minimapButton:SetNormalTexture("Interface/Icons/INV_Misc_QuestionMark") -- 替换为你想要的圆形图标
+local normalTexture = minimapButton:CreateTexture()
+normalTexture:SetAllPoints()
+normalTexture:SetTexture("Interface/Icons/INV_Misc_QuestionMark") -- 使用一个圆形图标
+minimapButton:SetNormalTexture(normalTexture)
 
 -- 设置高亮纹理
-minimapButton:SetHighlightTexture("Interface/Buttons/UI-Common-MouseHilight")
+local highlightTexture = minimapButton:CreateTexture()
+highlightTexture:SetAllPoints()
+highlightTexture:SetTexture("Interface/Buttons/UI-Common-MouseHilight")
+highlightTexture:SetBlendMode("ADD")
+minimapButton:SetHighlightTexture(highlightTexture)
 
--- 设置按钮位置
+-- 添加圆形效果
+minimapButton:SetBackdrop({
+    bgFile = "Interface/Buttons/WHITE8X8",
+    edgeFile = "Interface/Buttons/WHITE8X8",
+    tile = false,
+    tileSize = 0,
+    edgeSize = 15,
+    insets = { left = 0, right = 0, top = 0, bottom = 0 }
+})
+minimapButton:SetBackdropColor(1, 1, 1, 0)       -- 背景透明
+minimapButton:SetBackdropBorderColor(0, 0, 0, 1) -- 黑色边框
+
 minimapButton:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -10, -10)
 
 -- 小地图按钮点击事件
