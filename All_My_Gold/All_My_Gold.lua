@@ -115,14 +115,22 @@ highlightTexture:SetBlendMode("ADD")
 minimapButton:SetHighlightTexture(highlightTexture)
 
 -- 创建遮罩来实现圆形效果
-local mask = minimapButton:CreateMaskTexture()
-mask:SetTexture("Interface/Buttons/WHITE8X8")
+local mask = minimapButton:CreateTexture(nil, "OVERLAY")
 mask:SetAllPoints()
-mask:SetSize(30, 30)
-mask:SetTexCoord(0, 1, 0, 1)
-minimapButton:SetMaskTexture(mask)
+mask:SetTexture("Interface/Buttons/WHITE8X8") -- 白色方块作为遮罩
+mask:SetTexCoord(0.25, 0.75, 0.25, 0.75)      -- 使用纹理的中间部分作为圆形遮罩
+minimapButton:SetTexture(mask)
 
 minimapButton:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -10, -10)
+
+-- 小地图按钮点击事件
+minimapButton:SetScript("OnClick", function()
+    if frame:IsShown() then
+        frame:Hide()
+    else
+        frame:Show()
+    end
+end)
 
 -- 确保框架初始隐藏
 frame:Hide() -- 初始隐藏框架，待点击小地图按钮时显示
