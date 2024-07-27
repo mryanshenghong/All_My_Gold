@@ -2,7 +2,7 @@
 local characters = {}
 
 -- 创建一个框架，并使用 BackdropTemplateMixin
-local frame = CreateFrame("Frame", "MyFirstAddonFrame", UIParent, "BackdropTemplate")
+local frame = CreateFrame("Frame", "All_My_Gold_Frame", UIParent, "BackdropTemplate")
 frame:SetSize(300, 400)  -- 设置框架大小
 frame:SetPoint("CENTER") -- 设置框架位置为屏幕中央
 frame:SetBackdrop({
@@ -65,11 +65,7 @@ frame:RegisterEvent("ADDON_LOADED")
 -- 事件处理函数
 frame:SetScript("OnEvent", function(self, event, addonName)
     if event == "PLAYER_LOGIN" then
-        -- 确保只在玩家登录时显示框架
-        if not frame:IsShown() then
-            frame:Show()
-        end
-
+        -- 玩家登录时初始化数据
         local name = UnitName("player")
         local realm = GetRealmName()
         local fullName = name .. " - " .. realm
@@ -101,5 +97,21 @@ frame:SetScript("OnEvent", function(self, event, addonName)
     end
 end)
 
+-- 创建小地图按钮
+local minimapButton = CreateFrame("Button", "All_My_Gold_Minimap_Button", Minimap)
+minimapButton:SetSize(30, 30)
+minimapButton:SetNormalTexture("Interface/Icons/INV_Misc_QuestionMark") -- 替换为你想要的图标
+minimapButton:SetHighlightTexture("Interface/Buttons/UI-Common-MouseHilight")
+minimapButton:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -10, -10)
+
+-- 小地图按钮点击事件
+minimapButton:SetScript("OnClick", function()
+    if frame:IsShown() then
+        frame:Hide()
+    else
+        frame:Show()
+    end
+end)
+
 -- 确保框架初始隐藏
-frame:Hide() -- 初始隐藏框架，待玩家登录时显示
+frame:Hide() -- 初始隐藏框架，待点击小地图按钮时显示
