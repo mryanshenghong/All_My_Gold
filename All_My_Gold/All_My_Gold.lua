@@ -66,7 +66,9 @@ frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, addonName)
     if event == "PLAYER_LOGIN" then
         -- 确保只在玩家登录时显示框架
-        frame:Show()
+        if not frame:IsShown() then
+            frame:Show()
+        end
 
         local name = UnitName("player")
         local realm = GetRealmName()
@@ -99,5 +101,5 @@ frame:SetScript("OnEvent", function(self, event, addonName)
     end
 end)
 
--- 确保框架显示
+-- 确保框架初始隐藏
 frame:Hide() -- 初始隐藏框架，待玩家登录时显示
