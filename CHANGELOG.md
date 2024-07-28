@@ -1,8 +1,7 @@
-# Changelog 2024/7/27 
+# Changelog 2024/7/28
 
-- Add zhCN and enUS to I18N
-- Update MainFrame texture
-- Update MainFrame title style
+- Fix addon support version
+- Add missing I18n
 
 
 

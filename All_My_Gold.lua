@@ -163,7 +163,7 @@ function MyGoldTracker:UpdateTotalGold()
             end
         end
     end
-    dataObject.text = "合计: " .. C_CurrencyInfo.GetCoinTextureString(totalGold)
+    dataObject.text = L["GOLD_TOTAL"] .. C_CurrencyInfo.GetCoinTextureString(totalGold)
     -- print("Updated total gold: " .. totalGold)
 end
 
