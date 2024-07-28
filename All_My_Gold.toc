@@ -4,7 +4,7 @@
 ## Notes: Display characters gold
 ## Notes-zhCN: All my gold 显示所有角色金币总和
 ## Author: Bambi
-## Version: 1.0.2
+## Version: 1.0.3
 ## SavedVariables: All_My_Gold_Database
 
 

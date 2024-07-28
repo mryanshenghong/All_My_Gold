@@ -14,7 +14,6 @@ local dataObject = LibStub("LibDataBroker-1.1"):NewDataObject("All_My_Gold", {
     icon = "Interface\\Icons\\inv_misc_coin_01",
     OnClick = function(_, button)
         if button == "LeftButton" then
-            
             -- 关闭摘要窗口（如果打开的话）
             if MyGoldTracker.summaryFrame and MyGoldTracker.summaryFrame:IsVisible() then
                 MyGoldTracker.summaryFrame:Hide()
@@ -63,7 +62,6 @@ end
 -- 显示金币摘要窗口
 function MyGoldTracker:ShowGoldSummary()
     if not self.summaryFrame then
-        -- 创建 summaryFrame
         self.summaryFrame = CreateFrame("Frame", "MyGoldTrackerSummaryFrame", UIParent, "BasicFrameTemplateWithInset")
         self.summaryFrame:SetSize(300, 400)
         self.summaryFrame:SetPoint("CENTER")
@@ -73,10 +71,10 @@ function MyGoldTracker:ShowGoldSummary()
         self.summaryFrame:SetScript("OnDragStart", self.summaryFrame.StartMoving)
         self.summaryFrame:SetScript("OnDragStop", self.summaryFrame.StopMovingOrSizing)
 
-        local title = self.summaryFrame:CreateFontString(nil, "OVERLAY")
+        local title = self.summaryFrame:CreateFontString(nil, "BACKGROUND")
         title:SetFontObject("GameFontHighlightLarge")
         title:SetPoint("CENTER", self.summaryFrame.TitleBg, "CENTER", 5, 0)
-        title:SetText(L["GOLD_SUMMARY"] )
+        title:SetText(L["GOLD_SUMMARY"])
 
         local scrollFrame = CreateFrame("ScrollFrame", nil, self.summaryFrame, "UIPanelScrollFrameTemplate")
         scrollFrame:SetPoint("TOPLEFT", 10, -40)
@@ -159,7 +157,8 @@ function MyGoldTracker:UpdateTotalGold()
             if type(gold) == "number" then
                 totalGold = totalGold + gold
             else
-                local warning = ("").format(L["Warning: Invalid gold value for character %s in realm %s"],characterName,realmName)
+                local warning = ("").format(L["Warning: Invalid gold value for character %s in realm %s"], characterName,
+                    realmName)
                 print(warning)
             end
         end
