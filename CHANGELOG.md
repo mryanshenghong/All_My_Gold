@@ -1,7 +1,6 @@
-# Changelog 2024/7/28
+# Changelog 2024/7/29
 
-- Fix addon support version
-- Add missing I18n
+- Add WoW Wrath version support
 
 
 

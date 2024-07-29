@@ -1,9 +1,10 @@
-## Interface: 110000,110002
+## Interface: 30403
 ## X-Curse-Project-ID: 1072198
 ## Title: All my gold preview
 ## Notes: Display characters gold
 ## Notes-zhCN: All my gold 显示所有角色金币总和
 ## Author: Bambi
+## X-Flavor: Wrath
 ## Version: 1.0.5
 ## SavedVariables: All_My_Gold_Database
 
@@ -19,4 +20,4 @@ Libs\AceAddon-3.0\AceAddon-3.0.lua
 Libs\AceEvent-3.0\AceEvent-3.0.lua
 Libs\AceConsole-3.0\AceConsole-3.0.lua
 
-All_My_Gold.lua
+All_My_Gold_Wrath.lua
