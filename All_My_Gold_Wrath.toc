@@ -1,4 +1,4 @@
-## Interface: 30403
+## Interface: 38000
 ## X-Curse-Project-ID: 1072198
 ## Title: All my gold preview
 ## Notes: Display characters gold
