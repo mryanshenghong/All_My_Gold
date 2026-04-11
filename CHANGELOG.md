@@ -6,6 +6,7 @@
 # Changelog 2026/4/11
 
 - Update to latest interface version, update addOn version
+- Update main window to flat style
 
 
 
