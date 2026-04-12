@@ -47,6 +47,7 @@ end
 function MyGoldTracker:OnEnable()
     self:RegisterChatCommand("goldtracker", "ChatCommand")
     self:UpdateGoldData()
+    self:ShowGoldSummary()
 end
 
 function MyGoldTracker:ChatCommand(input)
@@ -63,7 +64,7 @@ end
 function MyGoldTracker:ShowGoldSummary()
     if not self.summaryFrame then
         self.summaryFrame = CreateFrame("Frame", "MyGoldTrackerSummaryFrame", UIParent, "BackdropTemplate")
-        self.summaryFrame:SetSize(300, 400)
+        self.summaryFrame:SetSize(300, 150)
         self.summaryFrame:SetPoint("CENTER")
         self.summaryFrame:SetMovable(true)
         self.summaryFrame:EnableMouse(true)
@@ -82,58 +83,58 @@ function MyGoldTracker:ShowGoldSummary()
 
 
         -- ===== 标题栏 =====
-        local header = CreateFrame("Frame", nil, self.summaryFrame, "BackdropTemplate")
-        header:SetHeight(30)
-        header:SetPoint("TOPLEFT")
-        header:SetPoint("TOPRIGHT")
+        -- local header = CreateFrame("Frame", nil, self.summaryFrame, "BackdropTemplate")
+        -- header:SetHeight(30)
+        -- header:SetPoint("TOPLEFT")
+        -- header:SetPoint("TOPRIGHT")
 
-        header:SetBackdrop({
-            bgFile = "Interface\\Buttons\\WHITE8x8"
-        })
-        header:SetBackdropColor(0.12, 0.12, 0.12, 1)
+        -- header:SetBackdrop({
+        --     bgFile = "Interface\\Buttons\\WHITE8x8"
+        -- })
+        -- header:SetBackdropColor(0.12, 0.12, 0.12, 1)
 
-        -- 拖动绑定到 header（更专业）
-        header:SetBackdropColor(0.15, 0.15, 0.15, 1)
-        -- 🔥 关键：绑定拖动
-        header:RegisterForDrag("LeftButton")
+        -- -- 拖动绑定到 header（更专业）
+        -- header:SetBackdropColor(0.15, 0.15, 0.15, 1)
+        -- -- 🔥 关键：绑定拖动
+        -- header:RegisterForDrag("LeftButton")
 
-        header:SetScript("OnDragStart", function()
-            self.summaryFrame:StartMoving()
-        end)
+        -- header:SetScript("OnDragStart", function()
+        --     self.summaryFrame:StartMoving()
+        -- end)
 
-        header:SetScript("OnDragStop", function()
-            self.summaryFrame:StopMovingOrSizing()
-        end)
+        -- header:SetScript("OnDragStop", function()
+        --     self.summaryFrame:StopMovingOrSizing()
+        -- end)
 
         -- 标题
-        local title = header:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        title:SetPoint("CENTER")
-        title:SetText(L["GOLD_SUMMARY"])
+        -- local title = header:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        -- title:SetPoint("CENTER")
+        -- title:SetText(L["GOLD_SUMMARY"])
 
-        local close = CreateFrame("Button", nil, self.summaryFrame)
-        close:SetSize(18, 18)
-        close:SetPoint("TOPRIGHT", self.summaryFrame, "TOPRIGHT", -6, -6)
+        -- local close = CreateFrame("Button", nil, self.summaryFrame)
+        -- close:SetSize(18, 18)
+        -- close:SetPoint("TOPRIGHT", self.summaryFrame, "TOPRIGHT", -6, -6)
 
-        -- ===== 点击关闭 =====
-        close:SetScript("OnClick", function()
-            self.summaryFrame:Hide()
-        end)
+        -- -- ===== 点击关闭 =====
+        -- close:SetScript("OnClick", function()
+        --     self.summaryFrame:Hide()
+        -- end)
 
         -- ===== X 文本 =====
-        local text = close:CreateFontString(nil, "OVERLAY")
-        text:SetAllPoints()
-        text:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE")
-        text:SetText("×")
-        text:SetTextColor(1, 1, 1)
+        -- local text = close:CreateFontString(nil, "OVERLAY")
+        -- text:SetAllPoints()
+        -- text:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE")
+        -- text:SetText("×")
+        -- text:SetTextColor(1, 1, 1)
 
-        -- ===== hover（轻微变化）=====
-        close:SetScript("OnEnter", function()
-            text:SetTextColor(0.8, 0.8, 0.8)
-        end)
+        -- -- ===== hover（轻微变化）=====
+        -- close:SetScript("OnEnter", function()
+        --     text:SetTextColor(0.8, 0.8, 0.8)
+        -- end)
 
-        close:SetScript("OnLeave", function()
-            text:SetTextColor(1, 1, 1)
-        end)
+        -- close:SetScript("OnLeave", function()
+        --     text:SetTextColor(1, 1, 1)
+        -- end)
 
         -- 窗口主要内容
         local scrollFrame = CreateFrame("ScrollFrame", nil, self.summaryFrame, "UIPanelScrollFrameTemplate")
@@ -141,7 +142,7 @@ function MyGoldTracker:ShowGoldSummary()
         scrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
 
         local content = CreateFrame("Frame", nil, scrollFrame)
-        content:SetSize(260, 360)
+        content:SetSize(300, 300)
         scrollFrame:SetScrollChild(content)
 
         local offsetY = -10
