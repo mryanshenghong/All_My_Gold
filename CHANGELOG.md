@@ -7,6 +7,8 @@
 
 - Update to latest interface version, update addOn version
 - Update main window to flat style
+- Show window by default, remove close button
+- TODO: scalable.
 
 
 
