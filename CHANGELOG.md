@@ -14,6 +14,6 @@
 - Add minicard to display current character's gold total
 - Add hover tooltip on minicard to display all characters' gold, wow token price and warband gold total
 - Add total gold display to minicard
-
+- Fixed high memory usage
 
 
