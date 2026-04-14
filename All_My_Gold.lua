@@ -7,6 +7,8 @@ MyGoldTracker = LibStub("AceAddon-3.0"):NewAddon("All_My_Gold", "AceConsole-3.0"
 
 -- 存储角色金币数据的数据库
 All_My_Gold_Database = All_My_Gold_Database or {}
+All_My_Gold_Database.position = All_My_Gold_Database.position or {}
+All_My_Gold_Database.data = All_My_Gold_Database.data or {}
 -- 创建 LibDataBroker 对象
 local dataObject = LibStub("LibDataBroker-1.1"):NewDataObject("All_My_Gold", {
     type = "data source",
@@ -47,7 +49,7 @@ end
 function MyGoldTracker:OnEnable()
     self:RegisterChatCommand("goldtracker", "ChatCommand")
     self:UpdateGoldData()
-    self:ShowGoldSummary()
+    self:GenerateGoldTrackerMiniUI()
 end
 
 function MyGoldTracker:ChatCommand(input)
@@ -81,61 +83,6 @@ function MyGoldTracker:ShowGoldSummary()
         self.summaryFrame:SetBackdropColor(0.08, 0.08, 0.08, 0.95)
         self.summaryFrame:SetBackdropBorderColor(0, 0, 0, 1)
 
-
-        -- ===== 标题栏 =====
-        -- local header = CreateFrame("Frame", nil, self.summaryFrame, "BackdropTemplate")
-        -- header:SetHeight(30)
-        -- header:SetPoint("TOPLEFT")
-        -- header:SetPoint("TOPRIGHT")
-
-        -- header:SetBackdrop({
-        --     bgFile = "Interface\\Buttons\\WHITE8x8"
-        -- })
-        -- header:SetBackdropColor(0.12, 0.12, 0.12, 1)
-
-        -- -- 拖动绑定到 header（更专业）
-        -- header:SetBackdropColor(0.15, 0.15, 0.15, 1)
-        -- -- 🔥 关键：绑定拖动
-        -- header:RegisterForDrag("LeftButton")
-
-        -- header:SetScript("OnDragStart", function()
-        --     self.summaryFrame:StartMoving()
-        -- end)
-
-        -- header:SetScript("OnDragStop", function()
-        --     self.summaryFrame:StopMovingOrSizing()
-        -- end)
-
-        -- 标题
-        -- local title = header:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        -- title:SetPoint("CENTER")
-        -- title:SetText(L["GOLD_SUMMARY"])
-
-        -- local close = CreateFrame("Button", nil, self.summaryFrame)
-        -- close:SetSize(18, 18)
-        -- close:SetPoint("TOPRIGHT", self.summaryFrame, "TOPRIGHT", -6, -6)
-
-        -- -- ===== 点击关闭 =====
-        -- close:SetScript("OnClick", function()
-        --     self.summaryFrame:Hide()
-        -- end)
-
-        -- ===== X 文本 =====
-        -- local text = close:CreateFontString(nil, "OVERLAY")
-        -- text:SetAllPoints()
-        -- text:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE")
-        -- text:SetText("×")
-        -- text:SetTextColor(1, 1, 1)
-
-        -- -- ===== hover（轻微变化）=====
-        -- close:SetScript("OnEnter", function()
-        --     text:SetTextColor(0.8, 0.8, 0.8)
-        -- end)
-
-        -- close:SetScript("OnLeave", function()
-        --     text:SetTextColor(1, 1, 1)
-        -- end)
-
         -- 窗口主要内容
         local scrollFrame = CreateFrame("ScrollFrame", nil, self.summaryFrame, "UIPanelScrollFrameTemplate")
         scrollFrame:SetPoint("TOPLEFT", 10, -40)
@@ -148,7 +95,7 @@ function MyGoldTracker:ShowGoldSummary()
         local offsetY = -10
         local totalGold = 0
 
-        for realmName, realmData in pairs(All_My_Gold_Database) do
+        for realmName, realmData in pairs(All_My_Gold_Database.data) do
             local realmTitle = content:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
             realmTitle:SetPoint("TOPLEFT", 10, offsetY)
             realmTitle:SetText(realmName)
@@ -181,6 +128,8 @@ end
 -- 重置数据库
 function MyGoldTracker:ResetDatabase()
     All_My_Gold_Database = {} -- 清空数据库
+    All_My_Gold_Database.position = All_My_Gold_Database.position or {}
+    All_My_Gold_Database.data = All_My_Gold_Database.data or {}
     -- print("All_My_Gold_Database has been reset.")
     self:UpdateTotalGold()    -- 更新总金币显示
 
@@ -201,10 +150,10 @@ function MyGoldTracker:UpdateGoldData()
     local gold = GetMoney() -- 获取当前角色的金币
 
     -- 确保数据库中有该角色的金币数据
-    if not All_My_Gold_Database[realmName] then
-        All_My_Gold_Database[realmName] = {}
+    if not All_My_Gold_Database.data[realmName] then
+        All_My_Gold_Database.data[realmName] = {}
     end
-    All_My_Gold_Database[realmName][characterName] = gold
+    All_My_Gold_Database.data[realmName][characterName] = gold
 
     -- print("Updated " .. characterName .. "'s gold to " .. C_CurrencyInfo.GetCoinTextureString(gold))
     self:UpdateTotalGold() -- 更新总金币显示
@@ -213,7 +162,7 @@ end
 -- 更新总金币显示
 function MyGoldTracker:UpdateTotalGold()
     local totalGold = 0
-    for realmName, realmData in pairs(All_My_Gold_Database) do
+    for realmName, realmData in pairs(All_My_Gold_Database.data) do
         for characterName, gold in pairs(realmData) do
             if type(gold) == "number" then
                 totalGold = totalGold + gold
@@ -227,6 +176,133 @@ function MyGoldTracker:UpdateTotalGold()
     dataObject.text = L["GOLD_TOTAL"] .. C_CurrencyInfo.GetCoinTextureString(totalGold)
     -- print("Updated total gold: " .. totalGold)
 end
+
+
+-- 创建界面UI小框体
+function MyGoldTracker:GenerateGoldTrackerMiniUI()
+    -- 200 * 20 迷你框体
+    local f = CreateFrame("Frame", "GoldTrackerFrame", UIParent, "BackdropTemplate")
+    f:SetSize(200, 20)
+
+    local pos = All_My_Gold_Database.position
+    if type(pos) == "table" and pos.point and pos.relativePoint and pos.x ~= nil and pos.y ~= nil then
+        f:ClearAllPoints()
+        f:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
+    else
+        f:SetPoint("CENTER", 0, 200)
+    end
+
+    local isMiniUIMoving = false
+
+    f:SetMovable(true)
+    f:EnableMouse(true)
+    f:RegisterForDrag("LeftButton")
+    f:SetClampedToScreen(true)
+
+    f:SetScript("OnDragStart", function(self)
+        isMiniUIMoving = true
+        self:StartMoving()
+    end)
+    f:SetScript("OnDragStop", function(self)
+        self:StopMovingOrSizing()
+
+        C_Timer.After(0.05, function()
+            isMiniUIMoving = false
+        end)
+
+        local point, _, relativePoint, xOfs, yOfs = self:GetPoint()
+
+        All_My_Gold_Database.position = {
+            point = point,
+            relativePoint = relativePoint,
+            x = xOfs,
+            y = yOfs
+        }
+        
+    end)
+
+    -- 扁平背景
+    f:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+    })
+    f:SetBackdropColor(0.1, 0.1, 0.1, 0.8)
+
+
+    -- 创建当前角色金币文本
+    local text = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    text:SetPoint("LEFT", 20, 0)
+    text:SetText(C_CurrencyInfo.GetCoinTextureString(GetMoney()))
+    
+
+    -- 鼠标点击或者悬浮显示对话框
+    f:SetScript("OnEnter", function(ss)
+        if isMiniUIMoving then return end
+
+        GameTooltip:SetOwner(ss, "ANCHOR_CURSOR")
+        GameTooltip:ClearLines()
+        GameTooltip:AddLine("金币统计", 1, 0.8, 0)
+
+        local totalGold = 0
+        for realmName, realmData in pairs(All_My_Gold_Database.data) do
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddLine(realmName, 0, 1, 1)
+            for characterName, gold in pairs(realmData) do
+                if type(gold) == "number" then
+
+                    GameTooltip:AddDoubleLine(
+                        characterName,
+                        C_CurrencyInfo.GetCoinTextureString(gold),
+                        1,1,1,
+                        1,1,1
+                    )
+                    totalGold = totalGold + gold
+                else
+                    GameTooltip:AddDoubleLine(
+                        characterName,
+                        "0",
+                        1,1,1,
+                        1,1,1
+                    )
+                end
+            end
+        end
+
+
+        -- 显示总金币
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddDoubleLine(
+            L["GOLD_TOTAL"],
+            C_CurrencyInfo.GetCoinTextureString(totalGold),
+            1,1,1,
+            1,1,1
+        )        
+
+        -- 战团银行金币总和
+        GameTooltip:AddDoubleLine(
+            L["WAR_BAND_TOTAL"],
+            C_CurrencyInfo.GetCoinTextureString(C_Bank.FetchDepositedMoney(Enum.BankType.Account)),
+            1,1,1,
+            1,1,1
+        )   
+
+        -- 时光徽章金币总和
+        GameTooltip:AddDoubleLine(
+            L["CURRENT_WOW_TOKEN"],
+            C_CurrencyInfo.GetCoinTextureString(C_WowTokenPublic.GetCurrentMarketPrice(),14),
+            1,1,1,
+            1,1,1
+        )        
+
+
+
+         GameTooltip:Show()
+    end)
+
+    f:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+end
+
 
 -- 创建小地图按钮
 local LDBIcon = LibStub("LibDBIcon-1.0")

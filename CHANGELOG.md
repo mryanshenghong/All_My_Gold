@@ -10,5 +10,9 @@
 - Show window by default, remove close button
 - TODO: scalable.
 
+# Changelog 2026/4/13
+- Add minicard to display current character's gold total
+- Add hover tooltip on minicard to display all characters' gold, wow token price and warband gold total
+
 
 

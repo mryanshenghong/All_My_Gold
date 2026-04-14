@@ -12,6 +12,8 @@ local locale_enUS = {
     -- Main window
     ["GOLD_SUMMARY"] = "Gold summary",
     ["GOLD_TOTAL"] = "Total gold",
+    ["WAR_BAND_TOTAL"] = "warband",
+    ["CURRENT_WOW_TOKEN"] = "WoW token price",
 
     -- LOG
     ["Warning: Invalid gold value for character %s in realm %s"] = "Warning: Invalid gold value for character %s in realm %s"

@@ -12,6 +12,8 @@ local locale_zhCN = {
     -- Main window
     ["GOLD_SUMMARY"] = "金币总和",
     ["GOLD_TOTAL"] = "合计",
+    ["WAR_BAND_TOTAL"] = "战团银行",
+    ["CURRENT_WOW_TOKEN"] = "时光徽章",
 
     -- LOG
     ["Warning: Invalid gold value for character %s in realm %s"] = "Warning: 角色 %s - %s 金币是无效值"
