@@ -10,6 +10,7 @@ local locale_enUS = {
     ["COMMAND_USAGE"] = "\n /goldtracker show to open gold summary window \n /goldtracker reset to reset all data",
 
     -- Main window
+    ["CURRENT_CHARACTER"] = "Current",
     ["GOLD_SUMMARY"] = "Gold summary",
     ["GOLD_TOTAL"] = "Total gold",
     ["WAR_BAND_TOTAL"] = "warband",

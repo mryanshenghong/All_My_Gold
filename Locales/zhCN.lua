@@ -10,6 +10,7 @@ local locale_zhCN = {
     ["COMMAND_USAGE"] = "\n /goldtracker show 打开金币总和窗口 \n /goldtracker reset 重置所有数据",
 
     -- Main window
+    ["CURRENT_CHARACTER"] = "当前",
     ["GOLD_SUMMARY"] = "金币总和",
     ["GOLD_TOTAL"] = "合计",
     ["WAR_BAND_TOTAL"] = "战团银行",
