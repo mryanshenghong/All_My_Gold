@@ -183,7 +183,7 @@ end
 function MyGoldTracker:GenerateGoldTrackerMiniUI()
     -- 200 * 20 迷你框体
     local f = CreateFrame("Frame", "GoldTrackerFrame", UIParent, "BackdropTemplate")
-    f:SetSize(320, 20)
+    f:SetSize(200, 20)
 
     local pos = All_My_Gold_Database.position
     if type(pos) == "table" and pos.point and pos.relativePoint and pos.x ~= nil and pos.y ~= nil then
@@ -231,7 +231,7 @@ function MyGoldTracker:GenerateGoldTrackerMiniUI()
     -- 创建当前角色金币文本
     local text = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     text:SetPoint("LEFT", 20, 0)
-    text:SetText(L['CURRENT_CHARACTER'].. ": " .. C_CurrencyInfo.GetCoinTextureString(GetMoney()) .. " | " ..  L["GOLD_TOTAL"] .. ": " .. C_CurrencyInfo.GetCoinTextureString(totalGold))
+    text:SetText(L["GOLD_TOTAL"] .. ": " .. C_CurrencyInfo.GetCoinTextureString(totalGold))
     
 
     -- 鼠标点击或者悬浮显示对话框

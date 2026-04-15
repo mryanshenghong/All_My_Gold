@@ -17,3 +17,7 @@
 - Fixed high memory usage
 
 
+# Changelog 2026/4/14
+- Remove current character's gold display from minicard because the minicard is too long
+- Resize minicard to 200
+
