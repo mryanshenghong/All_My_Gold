@@ -1,10 +1,10 @@
-## Interface: 120001
+## Interface: 120005
 ## X-Curse-Project-ID: 1072198
 ## Title: All my gold preview
 ## Notes: Display characters gold
 ## Notes-zhCN: All my gold 显示所有角色金币总和
 ## Author: Bambi
-## Version: 2.1.4
+## Version: 2.1.5
 ## SavedVariables: All_My_Gold_Database
 
 
