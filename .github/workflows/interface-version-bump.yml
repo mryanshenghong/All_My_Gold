@@ -1,0 +1,77 @@
+name: TOC Interface# Bump
+
+on:
+  schedule:
+    - cron: "0 0 1 * *"
+  workflow_dispatch:
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch WoW build version
+        id: version
+        run: |
+          RAW=$(curl -s http://us.patch.battle.net:1119/wow/versions)
+
+          CN_LINE=$(echo "$RAW" | grep '^cn|')
+
+          VERSION_FULL=$(echo "$CN_LINE" | cut -d'|' -f6)
+
+          VERSION=$(echo "$VERSION_FULL" | cut -d'.' -f1-3)
+
+          echo "Version string: $VERSION"
+
+          MAJOR=$(echo "$VERSION" | cut -d'.' -f1)
+          SEASON=$(echo "$VERSION" | cut -d'.' -f2)
+          MINOR=$(echo "$VERSION" | cut -d'.' -f3)
+
+          SEASON_PAD=$(printf "%02d" "$SEASON")
+          MINOR_PAD=$(printf "%02d" "$MINOR")
+
+          INTERFACE="${MAJOR}${SEASON_PAD}${MINOR_PAD}"
+
+          echo "Interface number: $INTERFACE"
+
+          echo "interface=$INTERFACE" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update TOC if interface number changed
+        run: |
+          INTERFACE="${{ steps.version.outputs.interface }}"
+          VERSION="${{ steps.version.outputs.version }}"
+
+          CURRENT=$(grep '^## Interface:' All_My_Gold.toc | awk '{print $3}')
+
+          echo "Current interface: $CURRENT"
+          echo "Latest interface:  $INTERFACE"
+
+          if [ "$CURRENT" = "$INTERFACE" ]; then
+            echo "Already up to date, nothing to do."
+            exit 0
+          fi
+
+          perl -i -pe "s/^## Interface: .*/## Interface: $INTERFACE/" All_My_Gold.toc
+
+          echo "TOC updated to $INTERFACE"
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          VERSION="${{ steps.version.outputs.version }}"
+          INTERFACE="${{ steps.version.outputs.interface }}"
+
+          git add All_My_Gold.toc
+          git commit -m "chore: update interface to $INTERFACE (WoW $VERSION)"
+          git push

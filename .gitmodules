@@ -1,0 +1,3 @@
+[submodule "Libs/LibStub"]
+	path = Libs/LibStub
+	url = https://github.com/lua-wow/LibStub/
