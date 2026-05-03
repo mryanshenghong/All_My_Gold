@@ -1,4 +1,4 @@
-name: TOC Interface# Bump
+name: Toc Interface & Version Bump
 
 on:
   schedule:
@@ -36,32 +36,36 @@ jobs:
           INTERFACE="${MAJOR}${SEASON_PAD}${MINOR_PAD}"
 
           echo "Interface number: $INTERFACE"
-
           echo "interface=$INTERFACE" >> $GITHUB_OUTPUT
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Update TOC if interface number changed
+        id: update
         run: |
-          INTERFACE="${{ steps.version.outputs.interface }}"
-          VERSION="${{ steps.version.outputs.version }}"
+          LATEST_INTERFACE_NUMBER="${{ steps.version.outputs.interface }}"
+          CURRENT_INTERFACE_NUMBER=$(grep '^## Interface:' All_My_Gold.toc | awk '{print $3}')
 
-          CURRENT=$(grep '^## Interface:' All_My_Gold.toc | awk '{print $3}')
+          CURRENT_ADDON_VERSION=$(grep '^## Version:' All_My_Gold.toc | awk '{print $3}')
 
-          echo "Current interface: $CURRENT"
-          echo "Latest interface:  $INTERFACE"
+          echo "Current interface: $CURRENT_INTERFACE_NUMBER"
+          echo "Latest interface:  $LATEST_INTERFACE_NUMBER"
 
-          if [ "$CURRENT" = "$INTERFACE" ]; then
+          if [ "$CURRENT_INTERFACE_NUMBER" = "$LATEST_INTERFACE_NUMBER" ]; then
             echo "Already up to date, nothing to do."
             exit 0
           fi
 
-          perl -i -pe "s/^## Interface: .*/## Interface: $INTERFACE/" All_My_Gold.toc
+          perl -i -pe "s/^## Interface: .*/## Interface: $LATEST_INTERFACE_NUMBER/" All_My_Gold.toc
 
-          echo "TOC updated to $INTERFACE"
+          NEW_ADDON_VERSION=$(echo "$CURRENT_ADDON_VERSION" | perl -pe 's/(\d+)$/$1+1/e')
+          perl -i -pe "s/^## Version: .*/## Version: $NEW_ADDON_VERSION/" All_My_Gold.toc
+          echo "new_addon_version=$NEW_ADDON_VERSION" >> $GITHUB_OUTPUT
+
+          echo "TOC Interface updated to $LATEST_INTERFACE_NUMBER"
+          echo "TOC Version updated to $NEW_ADDON_VERSION"
 
       - name: Commit and push if changed
         run: |
-          git config user.name  "github-actions[bot]"
+          git config user.name  "github-actions[bot]"   
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           if git diff --quiet; then
@@ -69,9 +73,15 @@ jobs:
             exit 0
           fi
 
-          VERSION="${{ steps.version.outputs.version }}"
-          INTERFACE="${{ steps.version.outputs.interface }}"
+          LATEST_INTERFACE_NUMBER="${{ steps.version.outputs.interface }}"
+          NEW_ADDON_VERSION="${{ steps.update.outputs.new_addon_version }}"
 
           git add All_My_Gold.toc
-          git commit -m "chore: update interface to $INTERFACE (WoW $VERSION)"
+          git commit -m "chore: update interface to $LATEST_INTERFACE_NUMBER, update version to $NEW_ADDON_VERSION"
           git push
+
+          TAG="v${NEW_ADDON_VERSION}-release"
+          git tag "$TAG"
+          git push origin "$TAG"
+
+          echo "Tagged: $TAG"
